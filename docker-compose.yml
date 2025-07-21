@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
+  dev-app:
+    build: ./dev
+    container_name: dev-app
+    restart: unless-stopped
+    environment:
+      - ENV=dev
+
+  prod-app:
+    build: ./prod
+    container_name: prod-app
+    restart: unless-stopped
+    environment:
+      - ENV=prod
+
+  jenkins:
+    build: ./jenkins
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+volumes:
+  jenkins_home:
